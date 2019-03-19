@@ -1,0 +1,11 @@
+{
+    "$schema": "./../deploy/schema.json",
+    "functions": [
+        {
+            "name": "hello",
+            "entrypoint": "Hello",
+            "src": "backend/functions/hello",
+            "description": "Simplest possible function that does anything."
+        }
+    ]
+}
