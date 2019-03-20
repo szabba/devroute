@@ -1,3 +1,4 @@
 .vscode/
 deploy/deploy
 out/
+deploy/config.sh
