@@ -1,0 +1,9 @@
+kind: pipeline
+name: default
+
+steps:
+- name: backend/devroute
+  image: golang:1.11
+  commands:
+  - cd backend/devroute
+  - go test -cover ./...
