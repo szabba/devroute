@@ -1,0 +1,1 @@
+[![Build Status](https://cloud.drone.io/api/badges/szabba/devroute/status.svg)](https://cloud.drone.io/szabba/devroute)
