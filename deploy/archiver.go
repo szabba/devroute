@@ -95,7 +95,8 @@ func (*Archiver) addTo(dst *zip.Writer, srcDir string) filepath.WalkFunc {
 		}
 		defer file.Close()
 
-		innerPath := strings.TrimPrefix(path, srcDir)
+		innerPath := strings.TrimPrefix(path, srcDir+"/")
+		log.Printf("adding %q to zip file as %q", path, innerPath)
 		entry, err := dst.Create(innerPath)
 		if err != nil {
 			return err
