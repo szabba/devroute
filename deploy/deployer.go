@@ -48,7 +48,7 @@ func NewDeployer(config Config, codeStorage *CodeStorage, functions *cloudfuncti
 }
 
 func (depl *Deployer) Deploy(build BuildResult, spec DeploymentSpec) error {
-	log.Printf("uploading backend the source code archive...")
+	log.Printf("uploading the backend source code archive...")
 	archiveURL, err := depl.codeStorage.Upload(build.BackendArchive)
 	if err != nil {
 		return err
@@ -67,26 +67,26 @@ func (depl *Deployer) Deploy(build BuildResult, spec DeploymentSpec) error {
 
 func (depl *Deployer) deployFunction(fn FuncDeploymentSpec, archiveURL string) error {
 	location := fmt.Sprintf("projects/%s/locations/%s", depl.projectID, depl.location)
-	apiFn := depl.toApiFn(fn, archiveURL)
-	name := fmt.Sprintf("%s/functions/%s", location, apiFn.Name)
+	apiFn := depl.toApiFn(fn, location, archiveURL)
 
 	fnAsJSON, _ := json.Marshal(apiFn)
 	fmt.Print("\n\n")
 	log.Printf("\t\t\t:: %s :: %s\n\n", location, fnAsJSON)
 
-	_, err := depl.functions.Projects.Locations.Functions.Get(name).Do()
+	_, err := depl.functions.Projects.Locations.Functions.Get(apiFn.Name).Do()
 	if err, ok := err.(*googleapi.Error); ok && err.Code == http.StatusNotFound {
 		return depl.deployNew(location, &apiFn)
 	}
 	if err != nil {
 		return err
 	}
-	return depl.deployUpdated(name, &apiFn)
+	return depl.deployUpdated(&apiFn)
 }
 
-func (depl *Deployer) toApiFn(fn FuncDeploymentSpec, archiveURL string) cloudfunctions.CloudFunction {
+func (depl *Deployer) toApiFn(fn FuncDeploymentSpec, location, archiveURL string) cloudfunctions.CloudFunction {
+	name := fmt.Sprintf("%s/functions/%s", location, fn.Name)
 	return cloudfunctions.CloudFunction{
-		Name:             fn.Name,
+		Name:             name,
 		Runtime:          _Runtime,
 		EntryPoint:       fn.Entrypoint,
 		Description:      fn.Description,
@@ -101,8 +101,8 @@ func (depl *Deployer) deployNew(location string, fn *cloudfunctions.CloudFunctio
 	return err
 }
 
-func (depl *Deployer) deployUpdated(location string, fn *cloudfunctions.CloudFunction) error {
+func (depl *Deployer) deployUpdated(fn *cloudfunctions.CloudFunction) error {
 	log.Printf("deploying updated function %q...", fn.Name)
-	_, err := depl.functions.Projects.Locations.Functions.Patch(location, fn).Do()
+	_, err := depl.functions.Projects.Locations.Functions.Patch(fn.Name, fn).Do()
 	return err
 }
