@@ -15,7 +15,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -68,10 +67,6 @@ func (depl *Deployer) Deploy(build BuildResult, spec DeploymentSpec) error {
 func (depl *Deployer) deployFunction(fn FuncDeploymentSpec, archiveURL string) error {
 	location := fmt.Sprintf("projects/%s/locations/%s", depl.projectID, depl.location)
 	apiFn := depl.toApiFn(fn, location, archiveURL)
-
-	fnAsJSON, _ := json.Marshal(apiFn)
-	fmt.Print("\n\n")
-	log.Printf("\t\t\t:: %s :: %s\n\n", location, fnAsJSON)
 
 	_, err := depl.functions.Projects.Locations.Functions.Get(apiFn.Name).Do()
 	if err, ok := err.(*googleapi.Error); ok && err.Code == http.StatusNotFound {
