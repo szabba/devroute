@@ -26,7 +26,6 @@ import (
 const (
 	_ApplicationZip = "application/zip"
 	_Runtime        = "go111"
-	_Location       = "europe-west1"
 )
 
 type Deployer struct {
@@ -41,7 +40,7 @@ type Deployer struct {
 func NewDeployer(config Config, archiver *Archiver, codeStorage *CodeStorage, functions *cloudfunctions.Service) *Deployer {
 	return &Deployer{
 		projectID:   config.CloudProject,
-		location:    _Location,
+		location:    config.Location,
 		archiver:    archiver,
 		codeStorage: codeStorage,
 		functions:   functions,

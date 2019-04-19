@@ -27,6 +27,7 @@ type Config struct {
 	CloudProject string
 	CodeBucket   string
 	SpecFile     string
+	Location     string
 }
 
 func ParseConfig() Config {
@@ -45,6 +46,7 @@ func ParseConfig() Config {
 	flag.StringVar(&cfg.Out, "out", "out", "the output diretory to use")
 	flag.StringVar(&cfg.CodeBucket, "code-bucket", "devroute-dev-code", "the Google Cloud Storage bucket to use for code uploads")
 	flag.StringVar(&cfg.SpecFile, "spec", "backend/deploy.json", "the file specifying the deployment details")
+	flag.StringVar(&cfg.Location, "location", "europe-west1", "the region to deploy to")
 	flag.Parse()
 
 	cfg.CloudProject = flag.Arg(0)

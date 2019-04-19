@@ -40,7 +40,7 @@ func NewCodeStorage(config Config, storage *storage.Client) *CodeStorage {
 	cs := new(CodeStorage)
 	cs.projectID = config.CloudProject
 	cs.config.bucketName = config.CodeBucket
-	cs.config.location = _Location
+	cs.config.location = config.Location
 	cs.storage = storage
 	return cs
 }

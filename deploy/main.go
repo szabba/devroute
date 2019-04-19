@@ -37,7 +37,6 @@ func main() {
 	dic.Provide(NewStorageClient)
 	dic.Provide(NewCloudFunctionsService)
 	dic.Provide(NewSpecLoader)
-	dic.Provide(NewBuilder)
 	dic.Provide(NewCodeStorage)
 	dic.Provide(NewDeployer)
 	err := dic.Invoke(Run)
@@ -47,7 +46,7 @@ func main() {
 	}
 }
 
-func Run(specLoader *SpecLoader, bldr *Builder, depl *Deployer) error {
+func Run(specLoader *SpecLoader, depl *Deployer) error {
 	workdir, err := os.Getwd()
 	if err != nil {
 		return err
