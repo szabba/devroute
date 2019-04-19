@@ -59,12 +59,7 @@ func Run(specLoader *SpecLoader, bldr *Builder, depl *Deployer) error {
 		return err
 	}
 
-	res, err := bldr.Build()
-	if err != nil {
-		return err
-	}
-
-	return depl.Deploy(res, spec)
+	return depl.Deploy(spec)
 }
 
 func NewCloudFunctionsService() (*cloudfunctions.Service, error) {

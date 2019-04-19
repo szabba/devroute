@@ -33,35 +33,46 @@ type Deployer struct {
 	projectID   string
 	codeBucket  string
 	location    string
+	archiver    *Archiver
 	codeStorage *CodeStorage
 	functions   *cloudfunctions.Service
 }
 
-func NewDeployer(config Config, codeStorage *CodeStorage, functions *cloudfunctions.Service) *Deployer {
+func NewDeployer(config Config, archiver *Archiver, codeStorage *CodeStorage, functions *cloudfunctions.Service) *Deployer {
 	return &Deployer{
 		projectID:   config.CloudProject,
 		location:    _Location,
+		archiver:    archiver,
 		codeStorage: codeStorage,
 		functions:   functions,
 	}
 }
 
-func (depl *Deployer) Deploy(build BuildResult, spec DeploymentSpec) error {
-	log.Printf("uploading the backend source code archive...")
-	archiveURL, err := depl.codeStorage.Upload(build.BackendArchive)
-	if err != nil {
-		return err
-	}
-	log.Printf("backend code at %q", archiveURL)
-
+func (depl *Deployer) Deploy(spec DeploymentSpec) error {
 	for _, fn := range spec.Functions {
-		err := depl.deployFunction(fn, archiveURL)
+		err := depl.deployOne(fn)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (depl *Deployer) deployOne(fn FuncDeploymentSpec) error {
+	log.Printf("archiving function %s sources from %s", fn.Name, fn.Src)
+	pathPattern := fmt.Sprintf("%s-*.zip", fn.Name)
+	archivePath, err := depl.archiver.Pack(fn.Src, pathPattern)
+	if err != nil {
+		return err
+	}
+	log.Printf("uploading the backend source code archive...")
+	archiveURL, err := depl.codeStorage.Upload(archivePath)
+	if err != nil {
+		return err
+	}
+	log.Printf("backend code at %q", archiveURL)
+	return depl.deployFunction(fn, archiveURL)
 }
 
 func (depl *Deployer) deployFunction(fn FuncDeploymentSpec, archiveURL string) error {
@@ -80,6 +91,7 @@ func (depl *Deployer) deployFunction(fn FuncDeploymentSpec, archiveURL string) e
 
 func (depl *Deployer) toApiFn(fn FuncDeploymentSpec, location, archiveURL string) cloudfunctions.CloudFunction {
 	name := fmt.Sprintf("%s/functions/%s", location, fn.Name)
+
 	return cloudfunctions.CloudFunction{
 		Name:             name,
 		Runtime:          _Runtime,

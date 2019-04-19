@@ -22,12 +22,11 @@ import (
 )
 
 type Config struct {
-	Timeout       time.Duration
-	Out           string
-	BackendModule string
-	CloudProject  string
-	CodeBucket    string
-	SpecFile      string
+	Timeout      time.Duration
+	Out          string
+	CloudProject string
+	CodeBucket   string
+	SpecFile     string
 }
 
 func ParseConfig() Config {
@@ -45,7 +44,6 @@ func ParseConfig() Config {
 	flag.DurationVar(&cfg.Timeout, "timeout", 10*time.Second, "the Google API request timeout")
 	flag.StringVar(&cfg.Out, "out", "out", "the output diretory to use")
 	flag.StringVar(&cfg.CodeBucket, "code-bucket", "devroute-dev-code", "the Google Cloud Storage bucket to use for code uploads")
-	flag.StringVar(&cfg.BackendModule, "backend-module", "backend/functions/hello", "the directory containing the Go module with Cloud Functions")
 	flag.StringVar(&cfg.SpecFile, "spec", "backend/deploy.json", "the file specifying the deployment details")
 	flag.Parse()
 

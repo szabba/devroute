@@ -33,6 +33,7 @@ type DeploymentSpec struct {
 type FuncDeploymentSpec struct {
 	Name        string `json:"name"`
 	Entrypoint  string `json:"entrypoint"`
+	Src         string `json:"src"`
 	Description string `json:"description"`
 }
 
