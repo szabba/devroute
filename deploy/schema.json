@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Deployment specification",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "functions"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "functions": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/function"
+            }
+        }
+    },
+    "definitions": {
+        "function": {
+            "type": "object",
+            "required": [
+                "name",
+                "entrypoint",
+                "src"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the function as seen in the Google Cloud Platform Console."
+                },
+                "entrypoint": {
+                    "type": "string",
+                    "description": "Name of the function to call."
+                },
+                "src": {
+                    "type": "string",
+                    "description": "A path to the directory containing the source code."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "A description of the function. Should be helpful to humans."
+                }
+            }
+        }
+    }
+}
