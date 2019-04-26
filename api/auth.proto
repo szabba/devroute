@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package devroute.auth;
+
+service UserService {
+    rpc LogIn(LogInRequest) returns (LogInResponse);
+}
+
+message LogInRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LogInResponse {
+    string token = 1;
+}
