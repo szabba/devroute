@@ -3,14 +3,28 @@ syntax = "proto3";
 package devroute.auth;
 
 service UserService {
-    rpc LogIn(LogInRequest) returns (LogInResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc Get(GetUserRequest) returns (GetUserResponse);
+  rpc LogIn(LogInRequest) returns (LogInResponse);
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message CreateUserResponse { string userID = 1; }
+
+message GetUserRequest { string userID = 1; }
+
+message GetUserResponse {
+  string userID = 1;
+  string username = 2;
 }
 
 message LogInRequest {
-    string username = 1;
-    string password = 2;
+  string username = 1;
+  string password = 2;
 }
 
-message LogInResponse {
-    string token = 1;
-}
+message LogInResponse { string token = 1; }

@@ -33,6 +33,10 @@ import url "net/url"
 // =====================
 
 type UserService interface {
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+
+	Get(context.Context, *GetUserRequest) (*GetUserResponse, error)
+
 	LogIn(context.Context, *LogInRequest) (*LogInResponse, error)
 }
 
@@ -42,14 +46,16 @@ type UserService interface {
 
 type userServiceProtobufClient struct {
 	client HTTPClient
-	urls   [1]string
+	urls   [3]string
 }
 
 // NewUserServiceProtobufClient creates a Protobuf client that implements the UserService interface.
 // It communicates using Protobuf and can be configured with a custom HTTPClient.
 func NewUserServiceProtobufClient(addr string, client HTTPClient) UserService {
 	prefix := urlBase(addr) + UserServicePathPrefix
-	urls := [1]string{
+	urls := [3]string{
+		prefix + "CreateUser",
+		prefix + "Get",
 		prefix + "LogIn",
 	}
 	if httpClient, ok := client.(*http.Client); ok {
@@ -64,12 +70,36 @@ func NewUserServiceProtobufClient(addr string, client HTTPClient) UserService {
 	}
 }
 
+func (c *userServiceProtobufClient) CreateUser(ctx context.Context, in *CreateUserRequest) (*CreateUserResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
+	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateUser")
+	out := new(CreateUserResponse)
+	err := doProtobufRequest(ctx, c.client, c.urls[0], in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceProtobufClient) Get(ctx context.Context, in *GetUserRequest) (*GetUserResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
+	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithMethodName(ctx, "Get")
+	out := new(GetUserResponse)
+	err := doProtobufRequest(ctx, c.client, c.urls[1], in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceProtobufClient) LogIn(ctx context.Context, in *LogInRequest) (*LogInResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
 	ctx = ctxsetters.WithServiceName(ctx, "UserService")
 	ctx = ctxsetters.WithMethodName(ctx, "LogIn")
 	out := new(LogInResponse)
-	err := doProtobufRequest(ctx, c.client, c.urls[0], in, out)
+	err := doProtobufRequest(ctx, c.client, c.urls[2], in, out)
 	if err != nil {
 		return nil, err
 	}
@@ -82,14 +112,16 @@ func (c *userServiceProtobufClient) LogIn(ctx context.Context, in *LogInRequest)
 
 type userServiceJSONClient struct {
 	client HTTPClient
-	urls   [1]string
+	urls   [3]string
 }
 
 // NewUserServiceJSONClient creates a JSON client that implements the UserService interface.
 // It communicates using JSON and can be configured with a custom HTTPClient.
 func NewUserServiceJSONClient(addr string, client HTTPClient) UserService {
 	prefix := urlBase(addr) + UserServicePathPrefix
-	urls := [1]string{
+	urls := [3]string{
+		prefix + "CreateUser",
+		prefix + "Get",
 		prefix + "LogIn",
 	}
 	if httpClient, ok := client.(*http.Client); ok {
@@ -104,12 +136,36 @@ func NewUserServiceJSONClient(addr string, client HTTPClient) UserService {
 	}
 }
 
+func (c *userServiceJSONClient) CreateUser(ctx context.Context, in *CreateUserRequest) (*CreateUserResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
+	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateUser")
+	out := new(CreateUserResponse)
+	err := doJSONRequest(ctx, c.client, c.urls[0], in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceJSONClient) Get(ctx context.Context, in *GetUserRequest) (*GetUserResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
+	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithMethodName(ctx, "Get")
+	out := new(GetUserResponse)
+	err := doJSONRequest(ctx, c.client, c.urls[1], in, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceJSONClient) LogIn(ctx context.Context, in *LogInRequest) (*LogInResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
 	ctx = ctxsetters.WithServiceName(ctx, "UserService")
 	ctx = ctxsetters.WithMethodName(ctx, "LogIn")
 	out := new(LogInResponse)
-	err := doJSONRequest(ctx, c.client, c.urls[0], in, out)
+	err := doJSONRequest(ctx, c.client, c.urls[2], in, out)
 	if err != nil {
 		return nil, err
 	}
@@ -164,6 +220,12 @@ func (s *userServiceServer) ServeHTTP(resp http.ResponseWriter, req *http.Reques
 	}
 
 	switch req.URL.Path {
+	case "/twirp/devroute.auth.UserService/CreateUser":
+		s.serveCreateUser(ctx, resp, req)
+		return
+	case "/twirp/devroute.auth.UserService/Get":
+		s.serveGet(ctx, resp, req)
+		return
 	case "/twirp/devroute.auth.UserService/LogIn":
 		s.serveLogIn(ctx, resp, req)
 		return
@@ -173,6 +235,264 @@ func (s *userServiceServer) ServeHTTP(resp http.ResponseWriter, req *http.Reques
 		s.writeError(ctx, resp, err)
 		return
 	}
+}
+
+func (s *userServiceServer) serveCreateUser(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveCreateUserJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveCreateUserProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *userServiceServer) serveCreateUserJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateUser")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	reqContent := new(CreateUserRequest)
+	unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err = unmarshaler.Unmarshal(req.Body, reqContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to parse request json"))
+		return
+	}
+
+	// Call service method
+	var respContent *CreateUserResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.UserService.CreateUser(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *CreateUserResponse and nil error while calling CreateUser. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	var buf bytes.Buffer
+	marshaler := &jsonpb.Marshaler{OrigName: true}
+	if err = marshaler.Marshal(&buf, respContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	respBytes := buf.Bytes()
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *userServiceServer) serveCreateUserProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateUser")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to read request body"))
+		return
+	}
+	reqContent := new(CreateUserRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to parse request proto"))
+		return
+	}
+
+	// Call service method
+	var respContent *CreateUserResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.UserService.CreateUser(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *CreateUserResponse and nil error while calling CreateUser. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *userServiceServer) serveGet(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveGetJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveGetProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *userServiceServer) serveGetJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Get")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	reqContent := new(GetUserRequest)
+	unmarshaler := jsonpb.Unmarshaler{AllowUnknownFields: true}
+	if err = unmarshaler.Unmarshal(req.Body, reqContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to parse request json"))
+		return
+	}
+
+	// Call service method
+	var respContent *GetUserResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.UserService.Get(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetUserResponse and nil error while calling Get. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	var buf bytes.Buffer
+	marshaler := &jsonpb.Marshaler{OrigName: true}
+	if err = marshaler.Marshal(&buf, respContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	respBytes := buf.Bytes()
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *userServiceServer) serveGetProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Get")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to read request body"))
+		return
+	}
+	reqContent := new(GetUserRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to parse request proto"))
+		return
+	}
+
+	// Call service method
+	var respContent *GetUserResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = s.UserService.Get(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetUserResponse and nil error while calling Get. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
 }
 
 func (s *userServiceServer) serveLogIn(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
@@ -788,16 +1108,22 @@ func callError(ctx context.Context, h *twirp.ServerHooks, err twirp.Error) conte
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 167 bytes of a gzipped FileDescriptorProto
+	// 264 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0x2c, 0x2d, 0xc9,
 	0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4d, 0x49, 0x2d, 0x2b, 0xca, 0x2f, 0x2d, 0x49,
-	0xd5, 0x03, 0x09, 0x2a, 0xb9, 0x71, 0xf1, 0xf8, 0xe4, 0xa7, 0x7b, 0xe6, 0x05, 0xa5, 0x16, 0x96,
-	0xa6, 0x16, 0x97, 0x08, 0x49, 0x71, 0x71, 0x94, 0x16, 0xa7, 0x16, 0xe5, 0x25, 0xe6, 0xa6, 0x4a,
-	0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0xc1, 0xf9, 0x20, 0xb9, 0x82, 0xc4, 0xe2, 0xe2, 0xf2, 0xfc,
-	0xa2, 0x14, 0x09, 0x26, 0x88, 0x1c, 0x8c, 0xaf, 0xa4, 0xca, 0xc5, 0x0b, 0x35, 0xa7, 0xb8, 0x20,
-	0x3f, 0xaf, 0x38, 0x55, 0x48, 0x84, 0x8b, 0xb5, 0x24, 0x3f, 0x3b, 0x35, 0x0f, 0x6a, 0x0a, 0x84,
-	0x63, 0x14, 0xc8, 0xc5, 0x1d, 0x5a, 0x9c, 0x5a, 0x14, 0x9c, 0x5a, 0x54, 0x96, 0x99, 0x9c, 0x2a,
-	0xe4, 0xc4, 0xc5, 0x0a, 0xd6, 0x25, 0x24, 0xad, 0x87, 0xe2, 0x2c, 0x3d, 0x64, 0x37, 0x49, 0xc9,
-	0x60, 0x97, 0x84, 0x58, 0x94, 0xc4, 0x06, 0xf6, 0x97, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x0e,
-	0x08, 0x3f, 0xbe, 0xe5, 0x00, 0x00, 0x00,
+	0xd5, 0x03, 0x09, 0x2a, 0x79, 0x73, 0x09, 0x3a, 0x17, 0xa5, 0x26, 0x96, 0xa4, 0x86, 0x16, 0xa7,
+	0x16, 0x05, 0xa5, 0x16, 0x96, 0xa6, 0x16, 0x97, 0x08, 0x49, 0x71, 0x71, 0x94, 0x16, 0xa7, 0x16,
+	0xe5, 0x25, 0xe6, 0xa6, 0x4a, 0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0xc1, 0xf9, 0x20, 0xb9, 0x82,
+	0xc4, 0xe2, 0xe2, 0xf2, 0xfc, 0xa2, 0x14, 0x09, 0x26, 0x88, 0x1c, 0x8c, 0xaf, 0xa4, 0xc3, 0x25,
+	0x84, 0x6c, 0x58, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x90, 0x18, 0x17, 0x1b, 0x48, 0xb7, 0xa7,
+	0x0b, 0xd4, 0x2c, 0x28, 0x4f, 0x49, 0x83, 0x8b, 0xcf, 0x3d, 0xb5, 0x04, 0xd9, 0x5e, 0x5c, 0x2a,
+	0x5d, 0xb9, 0xf8, 0xe1, 0x2a, 0xf1, 0x1b, 0x8a, 0xe2, 0x74, 0x26, 0x54, 0xa7, 0x2b, 0xb9, 0x71,
+	0xf1, 0xf8, 0xe4, 0xa7, 0x7b, 0xe6, 0x51, 0xea, 0x4d, 0x55, 0x2e, 0x5e, 0xa8, 0x39, 0x50, 0xc7,
+	0x88, 0x70, 0xb1, 0x96, 0xe4, 0x67, 0xa7, 0xe6, 0x41, 0x4d, 0x81, 0x70, 0x8c, 0x5e, 0x31, 0x72,
+	0x71, 0x83, 0xdc, 0x1c, 0x9c, 0x5a, 0x54, 0x96, 0x99, 0x9c, 0x2a, 0x14, 0xc8, 0xc5, 0x85, 0x08,
+	0x1d, 0x21, 0x05, 0x3d, 0x94, 0x88, 0xd0, 0xc3, 0x88, 0x05, 0x29, 0x45, 0x3c, 0x2a, 0xa0, 0x16,
+	0xbb, 0x70, 0x31, 0xbb, 0xa7, 0x96, 0x08, 0xc9, 0xa2, 0xa9, 0x44, 0x0d, 0x56, 0x29, 0x39, 0x5c,
+	0xd2, 0x50, 0x53, 0x9c, 0xb8, 0x58, 0xc1, 0xfe, 0x11, 0x92, 0x46, 0x53, 0x88, 0x1c, 0x5a, 0x52,
+	0x32, 0xd8, 0x25, 0x21, 0x66, 0x24, 0xb1, 0x81, 0x53, 0x97, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff,
+	0x77, 0x61, 0x88, 0xa4, 0x6b, 0x02, 0x00, 0x00,
 }
