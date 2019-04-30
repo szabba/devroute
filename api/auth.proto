@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package devroute.auth;
 
-service UserService {
+option go_package = "authapi";
+
+service Service {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
   rpc Get(GetUserRequest) returns (GetUserResponse);
   rpc LogIn(LogInRequest) returns (LogInResponse);

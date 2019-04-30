@@ -2,13 +2,13 @@
 // source: auth.proto
 
 /*
-Package devroute_auth is a generated twirp stub package.
+Package authapi is a generated twirp stub package.
 This code was generated with github.com/twitchtv/twirp/protoc-gen-twirp v5.7.0.
 
 It is generated from these files:
 	auth.proto
 */
-package devroute_auth
+package authapi
 
 import bytes "bytes"
 import strings "strings"
@@ -28,11 +28,11 @@ import io "io"
 import json "encoding/json"
 import url "net/url"
 
-// =====================
-// UserService Interface
-// =====================
+// =================
+// Service Interface
+// =================
 
-type UserService interface {
+type Service interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 
 	Get(context.Context, *GetUserRequest) (*GetUserResponse, error)
@@ -40,39 +40,39 @@ type UserService interface {
 	LogIn(context.Context, *LogInRequest) (*LogInResponse, error)
 }
 
-// ===========================
-// UserService Protobuf Client
-// ===========================
+// =======================
+// Service Protobuf Client
+// =======================
 
-type userServiceProtobufClient struct {
+type serviceProtobufClient struct {
 	client HTTPClient
 	urls   [3]string
 }
 
-// NewUserServiceProtobufClient creates a Protobuf client that implements the UserService interface.
+// NewServiceProtobufClient creates a Protobuf client that implements the Service interface.
 // It communicates using Protobuf and can be configured with a custom HTTPClient.
-func NewUserServiceProtobufClient(addr string, client HTTPClient) UserService {
-	prefix := urlBase(addr) + UserServicePathPrefix
+func NewServiceProtobufClient(addr string, client HTTPClient) Service {
+	prefix := urlBase(addr) + ServicePathPrefix
 	urls := [3]string{
 		prefix + "CreateUser",
 		prefix + "Get",
 		prefix + "LogIn",
 	}
 	if httpClient, ok := client.(*http.Client); ok {
-		return &userServiceProtobufClient{
+		return &serviceProtobufClient{
 			client: withoutRedirects(httpClient),
 			urls:   urls,
 		}
 	}
-	return &userServiceProtobufClient{
+	return &serviceProtobufClient{
 		client: client,
 		urls:   urls,
 	}
 }
 
-func (c *userServiceProtobufClient) CreateUser(ctx context.Context, in *CreateUserRequest) (*CreateUserResponse, error) {
+func (c *serviceProtobufClient) CreateUser(ctx context.Context, in *CreateUserRequest) (*CreateUserResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
-	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithServiceName(ctx, "Service")
 	ctx = ctxsetters.WithMethodName(ctx, "CreateUser")
 	out := new(CreateUserResponse)
 	err := doProtobufRequest(ctx, c.client, c.urls[0], in, out)
@@ -82,9 +82,9 @@ func (c *userServiceProtobufClient) CreateUser(ctx context.Context, in *CreateUs
 	return out, nil
 }
 
-func (c *userServiceProtobufClient) Get(ctx context.Context, in *GetUserRequest) (*GetUserResponse, error) {
+func (c *serviceProtobufClient) Get(ctx context.Context, in *GetUserRequest) (*GetUserResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
-	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithServiceName(ctx, "Service")
 	ctx = ctxsetters.WithMethodName(ctx, "Get")
 	out := new(GetUserResponse)
 	err := doProtobufRequest(ctx, c.client, c.urls[1], in, out)
@@ -94,9 +94,9 @@ func (c *userServiceProtobufClient) Get(ctx context.Context, in *GetUserRequest)
 	return out, nil
 }
 
-func (c *userServiceProtobufClient) LogIn(ctx context.Context, in *LogInRequest) (*LogInResponse, error) {
+func (c *serviceProtobufClient) LogIn(ctx context.Context, in *LogInRequest) (*LogInResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
-	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithServiceName(ctx, "Service")
 	ctx = ctxsetters.WithMethodName(ctx, "LogIn")
 	out := new(LogInResponse)
 	err := doProtobufRequest(ctx, c.client, c.urls[2], in, out)
@@ -106,39 +106,39 @@ func (c *userServiceProtobufClient) LogIn(ctx context.Context, in *LogInRequest)
 	return out, nil
 }
 
-// =======================
-// UserService JSON Client
-// =======================
+// ===================
+// Service JSON Client
+// ===================
 
-type userServiceJSONClient struct {
+type serviceJSONClient struct {
 	client HTTPClient
 	urls   [3]string
 }
 
-// NewUserServiceJSONClient creates a JSON client that implements the UserService interface.
+// NewServiceJSONClient creates a JSON client that implements the Service interface.
 // It communicates using JSON and can be configured with a custom HTTPClient.
-func NewUserServiceJSONClient(addr string, client HTTPClient) UserService {
-	prefix := urlBase(addr) + UserServicePathPrefix
+func NewServiceJSONClient(addr string, client HTTPClient) Service {
+	prefix := urlBase(addr) + ServicePathPrefix
 	urls := [3]string{
 		prefix + "CreateUser",
 		prefix + "Get",
 		prefix + "LogIn",
 	}
 	if httpClient, ok := client.(*http.Client); ok {
-		return &userServiceJSONClient{
+		return &serviceJSONClient{
 			client: withoutRedirects(httpClient),
 			urls:   urls,
 		}
 	}
-	return &userServiceJSONClient{
+	return &serviceJSONClient{
 		client: client,
 		urls:   urls,
 	}
 }
 
-func (c *userServiceJSONClient) CreateUser(ctx context.Context, in *CreateUserRequest) (*CreateUserResponse, error) {
+func (c *serviceJSONClient) CreateUser(ctx context.Context, in *CreateUserRequest) (*CreateUserResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
-	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithServiceName(ctx, "Service")
 	ctx = ctxsetters.WithMethodName(ctx, "CreateUser")
 	out := new(CreateUserResponse)
 	err := doJSONRequest(ctx, c.client, c.urls[0], in, out)
@@ -148,9 +148,9 @@ func (c *userServiceJSONClient) CreateUser(ctx context.Context, in *CreateUserRe
 	return out, nil
 }
 
-func (c *userServiceJSONClient) Get(ctx context.Context, in *GetUserRequest) (*GetUserResponse, error) {
+func (c *serviceJSONClient) Get(ctx context.Context, in *GetUserRequest) (*GetUserResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
-	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithServiceName(ctx, "Service")
 	ctx = ctxsetters.WithMethodName(ctx, "Get")
 	out := new(GetUserResponse)
 	err := doJSONRequest(ctx, c.client, c.urls[1], in, out)
@@ -160,9 +160,9 @@ func (c *userServiceJSONClient) Get(ctx context.Context, in *GetUserRequest) (*G
 	return out, nil
 }
 
-func (c *userServiceJSONClient) LogIn(ctx context.Context, in *LogInRequest) (*LogInResponse, error) {
+func (c *serviceJSONClient) LogIn(ctx context.Context, in *LogInRequest) (*LogInResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
-	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithServiceName(ctx, "Service")
 	ctx = ctxsetters.WithMethodName(ctx, "LogIn")
 	out := new(LogInResponse)
 	err := doJSONRequest(ctx, c.client, c.urls[2], in, out)
@@ -172,37 +172,37 @@ func (c *userServiceJSONClient) LogIn(ctx context.Context, in *LogInRequest) (*L
 	return out, nil
 }
 
-// ==========================
-// UserService Server Handler
-// ==========================
+// ======================
+// Service Server Handler
+// ======================
 
-type userServiceServer struct {
-	UserService
+type serviceServer struct {
+	Service
 	hooks *twirp.ServerHooks
 }
 
-func NewUserServiceServer(svc UserService, hooks *twirp.ServerHooks) TwirpServer {
-	return &userServiceServer{
-		UserService: svc,
-		hooks:       hooks,
+func NewServiceServer(svc Service, hooks *twirp.ServerHooks) TwirpServer {
+	return &serviceServer{
+		Service: svc,
+		hooks:   hooks,
 	}
 }
 
 // writeError writes an HTTP response with a valid Twirp error format, and triggers hooks.
 // If err is not a twirp.Error, it will get wrapped with twirp.InternalErrorWith(err)
-func (s *userServiceServer) writeError(ctx context.Context, resp http.ResponseWriter, err error) {
+func (s *serviceServer) writeError(ctx context.Context, resp http.ResponseWriter, err error) {
 	writeError(ctx, resp, err, s.hooks)
 }
 
-// UserServicePathPrefix is used for all URL paths on a twirp UserService server.
-// Requests are always: POST UserServicePathPrefix/method
+// ServicePathPrefix is used for all URL paths on a twirp Service server.
+// Requests are always: POST ServicePathPrefix/method
 // It can be used in an HTTP mux to route twirp requests along with non-twirp requests on other routes.
-const UserServicePathPrefix = "/twirp/devroute.auth.UserService/"
+const ServicePathPrefix = "/twirp/devroute.auth.Service/"
 
-func (s *userServiceServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	ctx = ctxsetters.WithPackageName(ctx, "devroute.auth")
-	ctx = ctxsetters.WithServiceName(ctx, "UserService")
+	ctx = ctxsetters.WithServiceName(ctx, "Service")
 	ctx = ctxsetters.WithResponseWriter(ctx, resp)
 
 	var err error
@@ -220,13 +220,13 @@ func (s *userServiceServer) ServeHTTP(resp http.ResponseWriter, req *http.Reques
 	}
 
 	switch req.URL.Path {
-	case "/twirp/devroute.auth.UserService/CreateUser":
+	case "/twirp/devroute.auth.Service/CreateUser":
 		s.serveCreateUser(ctx, resp, req)
 		return
-	case "/twirp/devroute.auth.UserService/Get":
+	case "/twirp/devroute.auth.Service/Get":
 		s.serveGet(ctx, resp, req)
 		return
-	case "/twirp/devroute.auth.UserService/LogIn":
+	case "/twirp/devroute.auth.Service/LogIn":
 		s.serveLogIn(ctx, resp, req)
 		return
 	default:
@@ -237,7 +237,7 @@ func (s *userServiceServer) ServeHTTP(resp http.ResponseWriter, req *http.Reques
 	}
 }
 
-func (s *userServiceServer) serveCreateUser(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) serveCreateUser(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -255,7 +255,7 @@ func (s *userServiceServer) serveCreateUser(ctx context.Context, resp http.Respo
 	}
 }
 
-func (s *userServiceServer) serveCreateUserJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) serveCreateUserJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
 	ctx = ctxsetters.WithMethodName(ctx, "CreateUser")
 	ctx, err = callRequestRouted(ctx, s.hooks)
@@ -275,7 +275,7 @@ func (s *userServiceServer) serveCreateUserJSON(ctx context.Context, resp http.R
 	var respContent *CreateUserResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = s.UserService.CreateUser(ctx, reqContent)
+		respContent, err = s.Service.CreateUser(ctx, reqContent)
 	}()
 
 	if err != nil {
@@ -310,7 +310,7 @@ func (s *userServiceServer) serveCreateUserJSON(ctx context.Context, resp http.R
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *userServiceServer) serveCreateUserProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) serveCreateUserProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
 	ctx = ctxsetters.WithMethodName(ctx, "CreateUser")
 	ctx, err = callRequestRouted(ctx, s.hooks)
@@ -334,7 +334,7 @@ func (s *userServiceServer) serveCreateUserProtobuf(ctx context.Context, resp ht
 	var respContent *CreateUserResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = s.UserService.CreateUser(ctx, reqContent)
+		respContent, err = s.Service.CreateUser(ctx, reqContent)
 	}()
 
 	if err != nil {
@@ -366,7 +366,7 @@ func (s *userServiceServer) serveCreateUserProtobuf(ctx context.Context, resp ht
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *userServiceServer) serveGet(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) serveGet(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -384,7 +384,7 @@ func (s *userServiceServer) serveGet(ctx context.Context, resp http.ResponseWrit
 	}
 }
 
-func (s *userServiceServer) serveGetJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) serveGetJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
 	ctx = ctxsetters.WithMethodName(ctx, "Get")
 	ctx, err = callRequestRouted(ctx, s.hooks)
@@ -404,7 +404,7 @@ func (s *userServiceServer) serveGetJSON(ctx context.Context, resp http.Response
 	var respContent *GetUserResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = s.UserService.Get(ctx, reqContent)
+		respContent, err = s.Service.Get(ctx, reqContent)
 	}()
 
 	if err != nil {
@@ -439,7 +439,7 @@ func (s *userServiceServer) serveGetJSON(ctx context.Context, resp http.Response
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *userServiceServer) serveGetProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) serveGetProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
 	ctx = ctxsetters.WithMethodName(ctx, "Get")
 	ctx, err = callRequestRouted(ctx, s.hooks)
@@ -463,7 +463,7 @@ func (s *userServiceServer) serveGetProtobuf(ctx context.Context, resp http.Resp
 	var respContent *GetUserResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = s.UserService.Get(ctx, reqContent)
+		respContent, err = s.Service.Get(ctx, reqContent)
 	}()
 
 	if err != nil {
@@ -495,7 +495,7 @@ func (s *userServiceServer) serveGetProtobuf(ctx context.Context, resp http.Resp
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *userServiceServer) serveLogIn(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) serveLogIn(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -513,7 +513,7 @@ func (s *userServiceServer) serveLogIn(ctx context.Context, resp http.ResponseWr
 	}
 }
 
-func (s *userServiceServer) serveLogInJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) serveLogInJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
 	ctx = ctxsetters.WithMethodName(ctx, "LogIn")
 	ctx, err = callRequestRouted(ctx, s.hooks)
@@ -533,7 +533,7 @@ func (s *userServiceServer) serveLogInJSON(ctx context.Context, resp http.Respon
 	var respContent *LogInResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = s.UserService.LogIn(ctx, reqContent)
+		respContent, err = s.Service.LogIn(ctx, reqContent)
 	}()
 
 	if err != nil {
@@ -568,7 +568,7 @@ func (s *userServiceServer) serveLogInJSON(ctx context.Context, resp http.Respon
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *userServiceServer) serveLogInProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *serviceServer) serveLogInProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
 	ctx = ctxsetters.WithMethodName(ctx, "LogIn")
 	ctx, err = callRequestRouted(ctx, s.hooks)
@@ -592,7 +592,7 @@ func (s *userServiceServer) serveLogInProtobuf(ctx context.Context, resp http.Re
 	var respContent *LogInResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = s.UserService.LogIn(ctx, reqContent)
+		respContent, err = s.Service.LogIn(ctx, reqContent)
 	}()
 
 	if err != nil {
@@ -624,16 +624,16 @@ func (s *userServiceServer) serveLogInProtobuf(ctx context.Context, resp http.Re
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *userServiceServer) ServiceDescriptor() ([]byte, int) {
+func (s *serviceServer) ServiceDescriptor() ([]byte, int) {
 	return twirpFileDescriptor0, 0
 }
 
-func (s *userServiceServer) ProtocGenTwirpVersion() string {
+func (s *serviceServer) ProtocGenTwirpVersion() string {
 	return "v5.7.0"
 }
 
-func (s *userServiceServer) PathPrefix() string {
-	return UserServicePathPrefix
+func (s *serviceServer) PathPrefix() string {
+	return ServicePathPrefix
 }
 
 // =====
@@ -1108,7 +1108,7 @@ func callError(ctx context.Context, h *twirp.ServerHooks, err twirp.Error) conte
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 264 bytes of a gzipped FileDescriptorProto
+	// 271 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4a, 0x2c, 0x2d, 0xc9,
 	0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4d, 0x49, 0x2d, 0x2b, 0xca, 0x2f, 0x2d, 0x49,
 	0xd5, 0x03, 0x09, 0x2a, 0x79, 0x73, 0x09, 0x3a, 0x17, 0xa5, 0x26, 0x96, 0xa4, 0x86, 0x16, 0xa7,
@@ -1119,11 +1119,11 @@ var twirpFileDescriptor0 = []byte{
 	0x0b, 0xd4, 0x2c, 0x28, 0x4f, 0x49, 0x83, 0x8b, 0xcf, 0x3d, 0xb5, 0x04, 0xd9, 0x5e, 0x5c, 0x2a,
 	0x5d, 0xb9, 0xf8, 0xe1, 0x2a, 0xf1, 0x1b, 0x8a, 0xe2, 0x74, 0x26, 0x54, 0xa7, 0x2b, 0xb9, 0x71,
 	0xf1, 0xf8, 0xe4, 0xa7, 0x7b, 0xe6, 0x51, 0xea, 0x4d, 0x55, 0x2e, 0x5e, 0xa8, 0x39, 0x50, 0xc7,
-	0x88, 0x70, 0xb1, 0x96, 0xe4, 0x67, 0xa7, 0xe6, 0x41, 0x4d, 0x81, 0x70, 0x8c, 0x5e, 0x31, 0x72,
-	0x71, 0x83, 0xdc, 0x1c, 0x9c, 0x5a, 0x54, 0x96, 0x99, 0x9c, 0x2a, 0x14, 0xc8, 0xc5, 0x85, 0x08,
-	0x1d, 0x21, 0x05, 0x3d, 0x94, 0x88, 0xd0, 0xc3, 0x88, 0x05, 0x29, 0x45, 0x3c, 0x2a, 0xa0, 0x16,
-	0xbb, 0x70, 0x31, 0xbb, 0xa7, 0x96, 0x08, 0xc9, 0xa2, 0xa9, 0x44, 0x0d, 0x56, 0x29, 0x39, 0x5c,
-	0xd2, 0x50, 0x53, 0x9c, 0xb8, 0x58, 0xc1, 0xfe, 0x11, 0x92, 0x46, 0x53, 0x88, 0x1c, 0x5a, 0x52,
-	0x32, 0xd8, 0x25, 0x21, 0x66, 0x24, 0xb1, 0x81, 0x53, 0x97, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff,
-	0x77, 0x61, 0x88, 0xa4, 0x6b, 0x02, 0x00, 0x00,
+	0x88, 0x70, 0xb1, 0x96, 0xe4, 0x67, 0xa7, 0xe6, 0x41, 0x4d, 0x81, 0x70, 0x8c, 0x9e, 0x31, 0x72,
+	0xb1, 0x07, 0xa7, 0x16, 0x95, 0x65, 0x26, 0xa7, 0x0a, 0x05, 0x72, 0x71, 0x21, 0x42, 0x46, 0x48,
+	0x41, 0x0f, 0x25, 0x12, 0xf4, 0x30, 0x62, 0x40, 0x4a, 0x11, 0x8f, 0x0a, 0xa8, 0xa5, 0x2e, 0x5c,
+	0xcc, 0xee, 0xa9, 0x25, 0x42, 0xb2, 0x68, 0x2a, 0x51, 0x83, 0x54, 0x4a, 0x0e, 0x97, 0x34, 0xd4,
+	0x14, 0x27, 0x2e, 0x56, 0xb0, 0x5f, 0x84, 0xa4, 0xd1, 0x14, 0x22, 0x87, 0x94, 0x94, 0x0c, 0x76,
+	0x49, 0x88, 0x19, 0x4e, 0x9c, 0x51, 0xec, 0x20, 0xd1, 0xc4, 0x82, 0xcc, 0x24, 0x36, 0x70, 0x22,
+	0x33, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0x4d, 0x5e, 0x05, 0x9c, 0x72, 0x02, 0x00, 0x00,
 }

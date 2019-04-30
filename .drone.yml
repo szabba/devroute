@@ -2,6 +2,11 @@ kind: pipeline
 name: default
 
 steps:
+- name: backend/api
+  image: golang:1.11
+  commands:
+  - cd backend/api
+  - go build ./...
 - name: backend/devroute
   image: golang:1.11
   commands:
