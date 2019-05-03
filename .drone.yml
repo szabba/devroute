@@ -7,6 +7,12 @@ steps:
   commands:
   - cd backend/api
   - go build ./...
+- name: backend/auth
+  image: golang:1.11
+  commands:
+  - cd backend/auth
+  - go build ./...
+  - go test -cover ./...
 - name: backend/devroute
   image: golang:1.11
   commands:

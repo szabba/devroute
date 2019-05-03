@@ -41,6 +41,12 @@
                 "description": {
                     "type": "string",
                     "description": "A description of the function. Should be helpful to humans."
+                },
+                "memory": {
+                    "type": "integer",
+                    "minimum": 128,
+                    "maximum": 2048,
+                    "description": "The memory to assign to the service, in MB. Defaults to 128 MB."
                 }
             }
         }

@@ -5,29 +5,30 @@
 package memory
 
 import (
+	"context"
 	"sync"
 
 	"github.com/gofrs/uuid"
-	"github.com/szabba/devroute/backend/devroute"
+	"github.com/szabba/devroute/backend/auth"
 )
 
 // A UserRepository "persists" users in memory.
 type UserRepository struct {
 	lock   sync.Mutex
-	events map[devroute.UserID][]devroute.UserEvent
+	events map[auth.UserID][]auth.UserEvent
 }
 
-var _ devroute.UserRepository = &UserRepository{}
+var _ auth.UserRepository = &UserRepository{}
 
 // NewUserRepository creates an in-memory repository of users.
 func NewUserRepository() *UserRepository {
 	return &UserRepository{
-		events: make(map[devroute.UserID][]devroute.UserEvent),
+		events: make(map[auth.UserID][]auth.UserEvent),
 	}
 }
 
 // New tries to create a versioned user with no events applied.
-func (repo *UserRepository) New() (*devroute.VersionedUser, error) {
+func (repo *UserRepository) New(_ context.Context) (*auth.VersionedUser, error) {
 	repo.lock.Lock()
 	defer repo.lock.Unlock()
 
@@ -36,38 +37,38 @@ func (repo *UserRepository) New() (*devroute.VersionedUser, error) {
 		return nil, err
 	}
 
-	versioned := &devroute.VersionedUser{}
-	versioned.ID = devroute.UserID(rawID)
+	versioned := &auth.VersionedUser{}
+	versioned.ID = auth.UserID(rawID)
 	return versioned, nil
 }
 
 // Load tries to restore a user with the given ID.
-func (repo *UserRepository) Load(id devroute.UserID) (*devroute.VersionedUser, error) {
+func (repo *UserRepository) Load(_ context.Context, id auth.UserID) (*auth.VersionedUser, error) {
 	repo.lock.Lock()
 	defer repo.lock.Unlock()
 
 	savedEvts := repo.events[id]
 	if len(savedEvts) == 0 {
-		return nil, devroute.ErrNotFound
+		return nil, auth.ErrUserNotFound
 	}
 
-	version := devroute.UserVersion(len(savedEvts))
-	user := &devroute.User{}
+	version := auth.UserVersion(len(savedEvts))
+	user := &auth.User{}
 	for _, evt := range savedEvts {
 		evt.ApplyTo(user)
 	}
 
-	return &devroute.VersionedUser{User: *user, Version: version}, nil
+	return &auth.VersionedUser{User: *user, Version: version}, nil
 }
 
 // SaveEvents extends a user's history with the given events.
-func (repo *UserRepository) SaveEvents(user *devroute.VersionedUser, evts ...devroute.UserEvent) error {
+func (repo *UserRepository) SaveEvents(_ context.Context, user *auth.VersionedUser, evts ...auth.UserEvent) error {
 	repo.lock.Lock()
 	defer repo.lock.Unlock()
 
 	savedEvts := repo.events[user.ID]
 	if len(savedEvts) != int(user.Version) {
-		return devroute.ErrConcurrentModification
+		return auth.ErrConcurrentModification
 	}
 
 	repo.events[user.ID] = append(savedEvts, evts...)

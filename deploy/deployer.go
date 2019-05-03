@@ -92,12 +92,13 @@ func (depl *Deployer) toApiFn(fn FuncDeploymentSpec, location, archiveURL string
 	name := fmt.Sprintf("%s/functions/%s", location, fn.Name)
 
 	return cloudfunctions.CloudFunction{
-		Name:             name,
-		Runtime:          _Runtime,
-		EntryPoint:       fn.Entrypoint,
-		Description:      fn.Description,
-		SourceArchiveUrl: archiveURL,
-		HttpsTrigger:     &cloudfunctions.HttpsTrigger{},
+		Name:              name,
+		Runtime:           _Runtime,
+		EntryPoint:        fn.Entrypoint,
+		Description:       fn.Description,
+		SourceArchiveUrl:  archiveURL,
+		AvailableMemoryMb: int64(fn.Memory),
+		HttpsTrigger:      &cloudfunctions.HttpsTrigger{},
 	}
 }
 

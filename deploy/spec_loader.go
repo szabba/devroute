@@ -35,6 +35,7 @@ type FuncDeploymentSpec struct {
 	Entrypoint  string `json:"entrypoint"`
 	Src         string `json:"src"`
 	Description string `json:"description"`
+	Memory      int    `json:"memory"`
 }
 
 func NewSpecLoader(cfg Config) *SpecLoader {
@@ -84,6 +85,10 @@ func (*SpecLoader) verifyFunc(fun FuncDeploymentSpec) error {
 
 	if strings.TrimSpace(fun.Entrypoint) == "" {
 		return fmt.Errorf("invalid function entrypoint %q", fun.Entrypoint)
+	}
+
+	if fun.Memory != 0 && (fun.Memory < 128 || fun.Memory > 2048) {
+		return fmt.Errorf("invalid function memory size %d (not in [%d;%d] range)", fun.Memory, 128, 2048)
 	}
 
 	return nil
